@@ -36,6 +36,9 @@ class SnakeGameEnv(gym.Env):
 
         self.last_action = action
 
+        if self.without_reward > self.size ** 3:
+            done = True
+
         if not done:
             x, y = self.snake[0]
             if action == 0:
@@ -63,20 +66,21 @@ class SnakeGameEnv(gym.Env):
                 self.need_new_tile = True
 
             elif next_tile_type == 1:
-                reward = 0
+                reward = -1
                 done = True
                 warnings.warn(f"Next block must not be snake head. Something is wrong.")
             
             elif next_tile_type == 2:
-                reward = 0
+                reward = -1
                 done = True
             
             else:
                 warnings.warn(f"The next tile type should be 0 or 1 or 2 or 3 but {next_tile_type} was detected.")
 
-            if self.length == self.size * self.size - 1:
+            if self.length == self.size * self.size:
                 done = True
                 reward += 1
+                # print("Win!")
 
             else:
                 self._update_tile()
