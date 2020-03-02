@@ -22,6 +22,8 @@ class SnakeGameEnv(gym.Env):
         self._update_tile()
         self.state_size = size * size * 3
         self.action_size = 4
+        self.action_space = spaces.Discrete(4)
+        self.observation_space = spaces.Box(low=0, high=1, shape=(size, size, 3))
         self.without_reward = 0
 
     def step(self, action):
