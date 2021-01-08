@@ -94,7 +94,7 @@ class SnakeGameEnv(gym.Env):
 
         return self.state
 
-    def render(self, mode='human', close=False):
+    def render(self, mode='rgb_array'):
         img_size = 600
         img_size = 600 - img_size % self.size
         tile_size = img_size // self.size
