@@ -6,6 +6,7 @@ import cv2
 from gym import error, spaces, utils
 from gym.utils import seeding
 
+
 class SnakeGameEnv(gym.Env):
     metadata = {'render.modes': ['human']}
 
@@ -62,7 +63,7 @@ class SnakeGameEnv(gym.Env):
             
             elif next_tile_type == 0:
                 self.length += 1
-                reward += 1
+                reward += len(self.snake)
                 self.without_reward = 0
                 self.snake.insert(0, (x, y))
                 self.need_new_tile = True
@@ -81,13 +82,13 @@ class SnakeGameEnv(gym.Env):
 
             if self.length == self.size * self.size:
                 done = True
-                reward += 1
+                reward += len(self.snake)
                 # print("Win!")
 
             else:
                 self._update_tile()
         
-        return self.state, reward, done, {}
+        return self.state, reward / (self.size * self.size), done, {}
 
     def reset(self):
         self.__init__(size=self.size)
