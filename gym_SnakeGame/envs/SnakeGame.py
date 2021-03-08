@@ -33,7 +33,7 @@ class SnakeGameEnv(gym.Env):
         self.without_reward += 1
 
         if not self._valid_action(action):
-            reward = 0
+            reward = -1
             done = True
 
         self.last_action = action
