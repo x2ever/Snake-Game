@@ -23,7 +23,7 @@ class SnakeGameEnv(gym.Env):
         self.need_new_tile = False
         self._update_tile()
         self.action_space = spaces.Discrete(4)
-        self.observation_space = spaces.Box(low=0, high=1, shape=(size, size, 2))
+        self.observation_space = spaces.Box(low=0, high=1, shape=(size, size, 3))
         self.without_reward = 0
 
     def step(self, action):
@@ -56,7 +56,7 @@ class SnakeGameEnv(gym.Env):
 
             next_tile_type = np.argmax(self.state[x, y])
 
-            if (self.state[x, y] == [0, 0]).all():
+            if (self.state[x, y] == [0, 0, 0]).all():
                 self.snake.insert(0, (x, y))
                 del self.snake[-1]
             
@@ -118,7 +118,7 @@ class SnakeGameEnv(gym.Env):
         return img
 
     def _update_tile(self):
-        self.state[:, :] = 0
+        self.state[:, :, :] = 0
 
         for i, snake_piece in enumerate(self.snake):
             x, y = snake_piece
