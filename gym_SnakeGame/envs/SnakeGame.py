@@ -36,8 +36,6 @@ class SnakeGameEnv(gym.Env):
             reward = -1
             done = True
 
-        self.last_action = action
-
         if self.without_reward > self.size ** 3:
             done = True
 
@@ -76,7 +74,7 @@ class SnakeGameEnv(gym.Env):
 
             if self.length == self.size * self.size:
                 done = True
-                reward += 1
+                reward += len(self.snake) / self.size
                 # print("Win!")
 
             else:
