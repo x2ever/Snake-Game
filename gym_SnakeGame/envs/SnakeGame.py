@@ -80,12 +80,12 @@ class SnakeGameEnv(gym.Env):
             else:
                 self._update_tile()
         
-        return np.transpose(np.copy(self.state), (2, 0, 1)), reward, done, {}
+        return np.copy(self.state), reward, done, {}
 
     def reset(self):
         self.__init__(size=self.size)
 
-        return np.transpose(np.copy(self.state), (2, 0, 1))
+        return np.copy(self.state)
 
     def render(self, mode='rgb_array'):
         img_size = 600
