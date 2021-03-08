@@ -60,7 +60,7 @@ class SnakeGameEnv(gym.Env):
             
             elif next_tile_type == 0:
                 self.length += 1
-                reward += 1
+                reward += len(self.snake)
                 self.without_reward = 0
                 self.snake.insert(0, (x, y))
                 self.need_new_tile = True
