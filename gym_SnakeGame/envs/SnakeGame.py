@@ -13,7 +13,7 @@ class SnakeGameEnv(gym.Env):
 
     def __init__(self, size=7):
         self.size = size
-        self.state = np.zeros((size, size, 2)) # 0: item, 1: Snake
+        self.state = np.zeros((size, size, 3), dtype=np.float32) # 0: item, 1: Snake, 2: None
         self.snake = list()
         self.snake.append((np.random.randint(0, self.size), np.random.randint(0, self.size)))
         self.item_pos = (np.random.randint(0, self.size), np.random.randint(0, self.size))
@@ -23,7 +23,7 @@ class SnakeGameEnv(gym.Env):
         self.need_new_tile = False
         self._update_tile()
         self.action_space = spaces.Discrete(4)
-        self.observation_space = spaces.Box(low=0, high=1, shape=(size, size, 2))
+        self.observation_space = spaces.Box(low=0, high=1, shape=(size, size, 3))
         self.without_reward = 0
 
     def step(self, action):
@@ -36,7 +36,7 @@ class SnakeGameEnv(gym.Env):
             reward = -1
             done = True
 
-        if self.without_reward > self.size ** 3:
+        if self.without_reward > self.size ** 2.5:
             done = True
 
         if not done:
@@ -54,7 +54,7 @@ class SnakeGameEnv(gym.Env):
 
             next_tile_type = np.argmax(self.state[x, y])
 
-            if (self.state[x, y] == [0, 0]).all():
+            if next_tile_type == 2:
                 self.snake.insert(0, (x, y))
                 del self.snake[-1]
             
@@ -116,23 +116,23 @@ class SnakeGameEnv(gym.Env):
         return img
 
     def _update_tile(self):
-        self.state[:, :, :] = 0
+        self.state[:, :] = np.array([0, 0, 1])
 
         for i, snake_piece in enumerate(self.snake):
             x, y = snake_piece
-            self.state[x, y, 1] = (i + 1) / len(self.snake)
+            self.state[x, y] = np.array([0, (i + 1) / len(self.snake), 0])
 
         if self.need_new_tile:
             self.need_new_tile = False
             while True:
                 item_x, item_y = np.random.randint(0, self.size, 2)
 
-                if (self.state[item_x, item_y] == [0, 0]).all():
+                if (self.state[item_x, item_y] == [0, 0, 1]).all():
                     self.item_pos = (item_x, item_y)
                     break
 
         item_x, item_y = self.item_pos
-        self.state[item_x, item_y, 0] = 1
+        self.state[item_x, item_y] = np.array([1, 0, 0])
 
     def _valid_action(self, action):
         x, y = self.snake[0]
