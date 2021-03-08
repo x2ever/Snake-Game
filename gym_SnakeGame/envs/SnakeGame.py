@@ -13,7 +13,7 @@ class SnakeGameEnv(gym.Env):
 
     def __init__(self, size=7):
         self.size = size
-        self.state = np.zeros((2, size, size)) # 0: item, 1: Snake
+        self.state = np.zeros((size, size, 2)) # 0: item, 1: Snake
         self.snake = list()
         self.snake.append((np.random.randint(0, self.size), np.random.randint(0, self.size)))
         self.item_pos = (np.random.randint(0, self.size), np.random.randint(0, self.size))
@@ -23,7 +23,7 @@ class SnakeGameEnv(gym.Env):
         self.need_new_tile = False
         self._update_tile()
         self.action_space = spaces.Discrete(4)
-        self.observation_space = spaces.Box(low=0, high=1, shape=(size, size, 2))
+        self.observation_space = spaces.Box(low=0, high=1, shape=(2, size, size))
         self.without_reward = 0
 
     def step(self, action):
