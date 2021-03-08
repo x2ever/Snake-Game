@@ -120,7 +120,7 @@ class SnakeGameEnv(gym.Env):
 
         for i, snake_piece in enumerate(self.snake):
             x, y = snake_piece
-            self.state[x, y, 1] = i / len(self.snake)
+            self.state[x, y, 1] = (i + 1) / len(self.snake)
 
         if self.need_new_tile:
             self.need_new_tile = False
