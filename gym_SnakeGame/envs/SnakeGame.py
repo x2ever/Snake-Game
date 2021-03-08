@@ -13,7 +13,7 @@ class SnakeGameEnv(gym.Env):
 
     def __init__(self, size=7):
         self.size = size
-        self.state = np.zeros((size, size, 2)) # 0: item, 1: Snake
+        self.state = np.zeros((2, size, size)) # 0: item, 1: Snake
         self.snake = list()
         self.snake.append((np.random.randint(0, self.size), np.random.randint(0, self.size)))
         self.item_pos = (np.random.randint(0, self.size), np.random.randint(0, self.size))
@@ -82,12 +82,12 @@ class SnakeGameEnv(gym.Env):
             else:
                 self._update_tile()
         
-        return self.state, reward, done, {}
+        return np.transpose(self.state, (2, 0, 1)), reward, done, {}
 
     def reset(self):
         self.__init__(size=self.size)
 
-        return self.state
+        return np.transpose(self.state, (2, 0, 1))
 
     def render(self, mode='rgb_array'):
         img_size = 600
