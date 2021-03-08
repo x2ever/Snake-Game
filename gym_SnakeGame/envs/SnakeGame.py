@@ -1,4 +1,5 @@
 import gym
+import math
 import numpy as np
 import warnings
 import cv2
@@ -12,7 +13,7 @@ class SnakeGameEnv(gym.Env):
 
     def __init__(self, size=7):
         self.size = size
-        self.state = np.zeros((size, size, 3)) # 0: item, 1: Snake Head, 2: Snake Body
+        self.state = np.zeros((size, size, 2)) # 0: item, 1: Snake
         self.snake = list()
         self.snake.append((np.random.randint(0, self.size), np.random.randint(0, self.size)))
         self.item_pos = (np.random.randint(0, self.size), np.random.randint(0, self.size))
@@ -21,10 +22,8 @@ class SnakeGameEnv(gym.Env):
         self.length = 1
         self.need_new_tile = False
         self._update_tile()
-        self.state_size = size * size * 3
-        self.action_size = 4
         self.action_space = spaces.Discrete(4)
-        self.observation_space = spaces.Box(low=0, high=1, shape=(size, size, 3))
+        self.observation_space = spaces.Box(low=0, high=1, shape=(size, size, 2))
         self.without_reward = 0
 
     def step(self, action):
@@ -57,23 +56,18 @@ class SnakeGameEnv(gym.Env):
 
             next_tile_type = np.argmax(self.state[x, y])
 
-            if (self.state[x, y] == [0, 0, 0]).all():
+            if (self.state[x, y] == [0, 0]).all():
                 self.snake.insert(0, (x, y))
                 del self.snake[-1]
             
             elif next_tile_type == 0:
                 self.length += 1
-                reward += len(self.snake)
+                reward += 1
                 self.without_reward = 0
                 self.snake.insert(0, (x, y))
                 self.need_new_tile = True
-
-            elif next_tile_type == 1:
-                reward = -1
-                done = True
-                warnings.warn(f"Next block must not be snake head. Something is wrong.")
             
-            elif next_tile_type == 2:
+            elif next_tile_type == 1:
                 reward = -1
                 done = True
             
@@ -82,13 +76,13 @@ class SnakeGameEnv(gym.Env):
 
             if self.length == self.size * self.size:
                 done = True
-                reward += len(self.snake)
+                reward += 1
                 # print("Win!")
 
             else:
                 self._update_tile()
         
-        return self.state, reward / (self.size * self.size), done, {}
+        return self.state, reward, done, {}
 
     def reset(self):
         self.__init__(size=self.size)
@@ -111,10 +105,11 @@ class SnakeGameEnv(gym.Env):
         for i, snake_piece in enumerate(self.snake):
             x, y = snake_piece
             
-            if i == 0:
-                cv2.rectangle(img, (x * tile_size + padding_size, y * tile_size + padding_size), ((x + 1) * tile_size - padding_size, (y + 1) * tile_size - padding_size), (50, 150, 50), -1)
-            else:
-                cv2.rectangle(img, (x * tile_size + padding_size, y * tile_size + padding_size), ((x + 1) * tile_size - padding_size, (y + 1) * tile_size - padding_size), (100, 150, 100), -1)
+            cv2.rectangle(
+                img,
+                (x * tile_size + padding_size, y * tile_size + padding_size),
+                ((x + 1) * tile_size - padding_size, (y + 1) * tile_size - padding_size),
+                (50 + (100 * i / len(self.snake)), 150, 50 + (100 * i / len(self.snake))), -1)
 
         item_x, item_y = self.item_pos
 
@@ -123,21 +118,18 @@ class SnakeGameEnv(gym.Env):
         return img
 
     def _update_tile(self):
-        self.state[:, :, :] = 0
+        self.state[:, :] = 0
 
         for i, snake_piece in enumerate(self.snake):
             x, y = snake_piece
-            if i == 0:
-                self.state[x, y, 1] = 1
-            else:
-                self.state[x, y, 2] = 1
+            self.state[x, y, 1] = i / len(self.snake)
 
         if self.need_new_tile:
             self.need_new_tile = False
             while True:
                 item_x, item_y = np.random.randint(0, self.size, 2)
 
-                if (self.state[item_x, item_y] == [0, 0, 0]).all():
+                if (self.state[item_x, item_y] == [0, 0]).all():
                     self.item_pos = (item_x, item_y)
                     break
 
@@ -173,14 +165,16 @@ if __name__ == "__main__":
     game = SnakeGameEnv()
 
     game.reset()
-    for i in range(5):
-        game.step(2)
+    while True:
+        obs, reward, done, _ = game.step(game.action_space.sample())
         img = game.render()
         cv2.imshow("Snake Game", img)
-        cv2.waitKey(500)
-        game.step(3)
-        img = game.render()
-        cv2.imshow("Snake Game", img)
-        cv2.waitKey(500)
+        if reward:
+            cv2.waitKey(1000)
+        else:
+            cv2.waitKey(1)
+        if done:
+            game.reset()
+
 
     cv2.destroyAllWindows()
