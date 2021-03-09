@@ -23,7 +23,7 @@ class SnakeGameEnv(gym.Env):
         self.need_new_tile = False
         self._update_tile()
         self.action_space = spaces.Discrete(4)
-        self.observation_space = spaces.Box(low=0, high=1, shape=(size, size, 3))
+        self.observation_space = spaces.Box(low=0, high=int(self.size ** 2), shape=(size, size, 3))
         self.without_reward = 0
 
     def step(self, action):
@@ -120,7 +120,7 @@ class SnakeGameEnv(gym.Env):
 
         for i, snake_piece in enumerate(self.snake):
             x, y = snake_piece
-            self.state[x, y] = np.array([0, (i + 1) / len(self.snake), 0])
+            self.state[x, y] = np.array([0, i + 1, 0])
 
         if self.need_new_tile:
             self.need_new_tile = False
