@@ -79,13 +79,15 @@ class SnakeGameEnv(gym.Env):
 
             else:
                 self._update_tile()
-        
-        return np.copy(self.state), reward, done, {}
+        img = np.copy(self.render())
+        img = cv2.resize(img, dsize=(0, 0), fx=0.5, fy=0.5, interpolation=cv2.INTER_LINEAR)
+        return img, reward, done, {}
 
     def reset(self):
         self.__init__(size=self.size)
-
-        return np.copy(self.state)
+        img = np.copy(self.render())
+        img = cv2.resize(img, dsize=(0, 0), fx=0.5, fy=0.5, interpolation=cv2.INTER_LINEAR)
+        return img
 
     def render(self, mode='rgb_array'):
         img_size = 600
@@ -93,7 +95,7 @@ class SnakeGameEnv(gym.Env):
         tile_size = img_size // self.size
         padding_size = int(tile_size * 0.03)
         img = np.zeros((img_size, img_size, 3), np.uint8)
-
+ 
         cv2.rectangle(img, (0, 0), (img_size, img_size), (200, 200, 200), -1)
 
         for i in range(self.size):
