@@ -80,7 +80,7 @@ class SnakeGameEnv(gym.Env):
             else:
                 self._update_tile()
         
-        return np.copy(self.state), reward / (self.size ** 2 * (self.size ** 2 + 1)) , done, {}
+        return np.copy(self.state), 200 * reward / (self.size ** 2 * (self.size ** 2 + 1)) , done, {}
 
     def reset(self):
         self.__init__(size=self.size)
