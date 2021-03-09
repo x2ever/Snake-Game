@@ -23,7 +23,7 @@ class SnakeGameEnv(gym.Env):
         self.need_new_tile = False
         self._update_tile()
         self.action_space = spaces.Discrete(4)
-        self.observation_space = spaces.Box(low=0, high=255, shape=(300, 300, 3))
+        self.observation_space = spaces.Box(low=0, high=1, shape=(size, size, 3))
         self.without_reward = 0
 
     def step(self, action):
@@ -79,15 +79,13 @@ class SnakeGameEnv(gym.Env):
 
             else:
                 self._update_tile()
-        img = np.copy(self.render())
-        img = cv2.resize(img, dsize=(0, 0), fx=0.5, fy=0.5, interpolation=cv2.INTER_LINEAR)
-        return img, reward, done, {}
+        
+        return np.copy(self.state), reward, done, {}
 
     def reset(self):
         self.__init__(size=self.size)
-        img = np.copy(self.render())
-        img = cv2.resize(img, dsize=(0, 0), fx=0.5, fy=0.5, interpolation=cv2.INTER_LINEAR)
-        return img
+
+        return np.copy(self.state)
 
     def render(self, mode='rgb_array'):
         img_size = 600
@@ -95,7 +93,7 @@ class SnakeGameEnv(gym.Env):
         tile_size = img_size // self.size
         padding_size = int(tile_size * 0.03)
         img = np.zeros((img_size, img_size, 3), np.uint8)
- 
+
         cv2.rectangle(img, (0, 0), (img_size, img_size), (200, 200, 200), -1)
 
         for i in range(self.size):
