@@ -120,7 +120,7 @@ class SnakeGameEnv(gym.Env):
 
         for i, snake_piece in enumerate(self.snake):
             x, y = snake_piece
-            self.state[x, y] = np.array([0, i + 1, 0])
+            self.state[x, y] = np.array([0, len(self.snake) - i, 0])
 
         if self.need_new_tile:
             self.need_new_tile = False
